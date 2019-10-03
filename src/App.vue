@@ -36,7 +36,6 @@ import {FSWatcher} from 'chokidar';
 
 let _watcher = FSWatcher;
 let player;
-let entity;
 let match;
 let game;
 
@@ -138,8 +137,7 @@ export default {
 
           this.players.push({
             name: name,
-            position: position,
-            entity: ''
+            position: position
           })
         }
 
@@ -154,20 +152,6 @@ export default {
 
           if (position == 2 && this.players[1].name.includes('UNKNOWN')) {
              this.players[1].name = name
-          }
-        }
-
-        // get players entity
-        if (entity = line.match(/\[Power\] PowerTaskList\.DebugPrintPower\(\) -     FULL_ENTITY - Updating \[entityName=([^\s]+) id=([^\s]+) zone=PLAY zonePos=0 cardId=([^\s]+) player=(\d)/)) {
-          const position = entity[4]
-          const name = entity[1]
-
-          if (position == 1) {
-            this.players[0].entity = name
-          }
-
-          if (position == 2) {
-            this.players[1].entity = name
           }
         }
 
@@ -190,10 +174,12 @@ export default {
             status: game[2]
           })
 
-          // console.log(this.players)
-          // console.log(this.match)
-          // console.log(this.over)
-          // console.log('--------------')
+          // send match data to server
+          console.log({
+            match: this.match,
+            players: this.players,
+            over: this.over
+          })
         }
 
         // console.log(line)
