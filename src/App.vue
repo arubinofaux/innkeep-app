@@ -10,12 +10,12 @@
                        />
     </div>
 
-    <div class="players" v-if="this.player.name">
-      <p>{{this.player}}</p>
+    <div class="players" v-if="this.players[0]">
+      <p>{{this.players[0]}}</p>
       <h3>vs</h3>
-      <p>{{this.opponent}}</p>
-      <br>
-      <p v-if="this.match.game">{{this.match}}</p>
+      <p>{{this.players[1]}}</p>
+      <p v-if="this.match.game">match id: {{this.match.game}}</p>
+      <p v-if="this.over[0]">{{this.over}}</p>
     </div>
 
     <hr>
@@ -36,31 +36,23 @@ import {FSWatcher} from 'chokidar';
 
 let _watcher = FSWatcher;
 let player;
-let opponent;
 let entity;
 let match;
+let game;
 
 export default {
   name: 'app',
   data: function() {
     return {
       lastFileSize: 0,
-      player: {
-        name: '',
-        position: 0,
-        entity: ''
-      },
-      opponent: {
-        name: '',
-        position: 0,
-        entity: ''
-      },
+      players: [],
       match: {
         server: '',
         game: '',
         client: '',
         spectateKey: ''
-      }
+      },
+      over: []
     };
   },
   methods: {
@@ -81,11 +73,11 @@ export default {
       watcher.on('ready', () => {
       });
 
-      // watcher.on('add', (filePath, stats) => {
-      //   if (stats) {
-      //     this.update(filePath, stats);
-      //   }
-      // });
+      watcher.on('add', (filePath, stats) => {
+        if (stats) {
+          this.update(filePath, stats);
+        }
+      });
 
       watcher.on('change', (filePath, stats) => {
         if (stats) {
@@ -104,20 +96,17 @@ export default {
       this._watcher = null
       this.lastFileSize = 0
       
-      this.player = {
-        name: '',
-        position: 0
-      }
-      this.opponent = {
-        name: '',
-        position: 0
-      }
-      this.match = {
-        server: '',
-        game: '',
-        client: '',
-        spectateKey: ''
-      }
+      this.reset()
+    },
+    reset() {
+      this.players = []
+      // this.match = {
+      //   server: '',
+      //   game: '',
+      //   client: '',
+      //   spectateKey: ''
+      // }
+      this.over = []
     },
     update: function (filePath, stats) {
       const newFileSize = stats.size;
@@ -137,65 +126,74 @@ export default {
     parseBuffer: function(buffer) {
 
       splitLines(buffer.toString()).forEach(line => {
-        // grab players name
+        // starting new game
+        if (line.match(/\[Power\] GameState\.DebugPrintPower\(\) -\s*CREATE_GAME/)) {
+          this.reset()
+        }
+
+        // grab players
         if (player = line.match(/\[Power\] GameState\.DebugPrintGame\(\) - PlayerID=(\d), PlayerName=(.*)$/)) {
-          const index = player[1]
+          const position = player[1]
           const name = player[2]
 
-          if (index == 1) {
-            // check if name UNKNOWN
-            if (name == 'UNKNOWN HUMAN PLAYER') {
-              // opponent has position 1
-              this.player.position = 2
-              this.opponent.name = name
-              this.opponent.position = 1
-            } else {
-              // player has position 1
-              this.player.name = name
-              this.player.position = 1
-              this.opponent.position = 2
-            }
-          } else {
-            if (name != 'UNKNOWN HUMAN PLAYER') {
-              this.player.name = name
-            } else {
-              this.opponent.name = name
-            }
+          this.players.push({
+            name: name,
+            position: position,
+            entity: ''
+          })
+        }
+
+        // backup name grab
+        if (player = line.match(/\[Power\] GameState.DebugPrintEntitiesChosen\(\) - id=(\d) Player=([^\s]+) EntitiesCount/)) {
+          const position = player[1]
+          const name = player[2]
+
+          if (position == 1 && this.players[0].name.includes('UNKNOWN')) {
+             this.players[0].name = name
+          }
+
+          if (position == 2 && this.players[1].name.includes('UNKNOWN')) {
+             this.players[1].name = name
           }
         }
 
-        // grab the opponents name
-        if (opponent = line.match(/\[Power\] GameState.DebugPrintEntitiesChosen\(\) - id=(\d) Player=([^\s]+) EntitiesCount/)) {
-          const index = opponent[1]
-          const name = opponent[2]
-
-          if (this.opponent.position == index) {
-            this.opponent.name = name
-          }
-        }
-
-        // get player and opponent entity
+        // get players entity
         if (entity = line.match(/\[Power\] PowerTaskList\.DebugPrintPower\(\) -     FULL_ENTITY - Updating \[entityName=([^\s]+) id=([^\s]+) zone=PLAY zonePos=0 cardId=([^\s]+) player=(\d)/)) {
-          const index = entity[4]
+          const position = entity[4]
           const name = entity[1]
 
-          if (index == this.player.position) {
-            this.player.entity = name
+          if (position == 1) {
+            this.players[0].entity = name
           }
 
-          if (index == this.opponent.position) {
-            this.opponent.entity = name
+          if (position == 2) {
+            this.players[1].entity = name
           }
         }
 
         // get match data
         if (match = line.match(/\Network\.GotoGameServer -- address= ([^\s]+) game=([^\s]+) client=([^\s]+) spectateKey=([^\s]+)/)) {
+          // console.log(match)
           this.match = {
-            server: match[1],
-            game: match[2],
-            client: match[3],
+            server: match[1].replace(',', ''),
+            game: match[2].replace(',', ''),
+            client: match[3].replace(',', ''),
             spectateKey: match[4]
           }
+        }
+
+        // game over
+        if (game = line.match(/\[Power\] PowerTaskList\.DebugPrintPower\(\) -\s+TAG_CHANGE Entity=(.*) tag=PLAYSTATE value=(LOST|WON|TIED)/)) {
+          
+          this.over.push({
+            player: game[1],
+            status: game[2]
+          })
+
+          // console.log(this.players)
+          // console.log(this.match)
+          // console.log(this.over)
+          // console.log('--------------')
         }
 
         // console.log(line)
