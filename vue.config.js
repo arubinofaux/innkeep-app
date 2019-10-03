@@ -5,7 +5,11 @@ module.exports = {
         "appId": "com.yolo.innkeep",
         "productName": "innKeep",
         "win": {
-          "publish": ["github"],
+          publish: [
+            {
+              provider: "github"
+            }
+          ],
           "target": [
             {
               "target": "nsis",
