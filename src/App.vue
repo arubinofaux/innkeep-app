@@ -6,7 +6,7 @@
       <toggle-button @change="onChangeEventHandler"
                       :labels="{checked: 'Stop Tracking', unchecked: 'Start Tracking'}" 
                       :color="{checked: '#FF0000', unchecked: '#00FF00', disabled: '#CCCCCC'}"
-                      :width=104 
+                      :width=104
                        />
     </div>
 
@@ -20,10 +20,11 @@
 
     <hr>
     <div class="tracking">
-      <h3>Tracking logs:</h3>
-      <input type="text" value="C:\Program Files (x86)\Hearthstone\Hearthstone_Data\output_log.txt">
+      <h4>Tracking logs:</h4>
+      <input type="text" v-model="logPath">
+      <button v-on:click="changeLogPath">Change log path</button>
     </div>
-
+    <br>
     <h4>Beta Software :)</h4>
   </div>
 </template>
@@ -43,6 +44,7 @@ export default {
   name: 'app',
   data: function() {
     return {
+      logPath: 'C:\\Program Files (x86)\\Hearthstone\\Hearthstone_Data\\output_log.txt',
       lastFileSize: 0,
       players: [],
       match: {
@@ -55,7 +57,10 @@ export default {
     };
   },
   methods: {
-    onChangeEventHandler(value){
+    changeLogPath() {
+      this.stopLog()
+    },
+    onChangeEventHandler(value) {
       if (value.value == true) {
         this.startLog()
       } else {
@@ -63,7 +68,7 @@ export default {
       }
     },
     startLog() {
-      const watcher = chokidar.watch("C:\\Program Files (x86)\\Hearthstone\\Hearthstone_Data\\output_log.txt", {
+      const watcher = chokidar.watch(this.logPath, {
         persistent: true,
         disableGlobbing: true,
         usePolling: true
@@ -208,7 +213,8 @@ export default {
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     margin: 0px;
   }
 
@@ -223,7 +229,12 @@ export default {
   .tracking {
     text-align: left;
 
-    h3 {
+    button {
+      margin-top: 7px;
+      cursor: pointer;
+    }
+
+    h4 {
       margin: 0px 0px 7px 0px;
     }
 
