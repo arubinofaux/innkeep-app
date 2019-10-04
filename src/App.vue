@@ -33,6 +33,7 @@
 import * as fs from 'fs';
 const chokidar = require('chokidar');
 const splitLines = require('split-lines');
+const axios = require('axios');
 import {FSWatcher} from 'chokidar';
 
 let _watcher = FSWatcher;
@@ -180,11 +181,23 @@ export default {
           })
 
           // send match data to server
-          console.log({
+          // console.log({
+          //   match: this.match,
+          //   players: this.players,
+          //   over: this.over
+          // })
+
+          axios.post('http://localhost:3000/api/ping/matches', {
             match: this.match,
             players: this.players,
             over: this.over
           })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
         }
 
         // console.log(line)
