@@ -175,22 +175,23 @@ export default {
         // game over
         if (game = line.match(/\[Power\] PowerTaskList\.DebugPrintPower\(\) -\s+TAG_CHANGE Entity=(.*) tag=PLAYSTATE value=(LOST|WON|TIED)/)) {
           
-          this.over.push({
-            player: game[1],
-            status: game[2]
-          })
+          if (this.players[0].name == game[1]) {
+            this.players[0].status = game[2]
+          }
+
+          if (this.players[1].name == game[1]) {
+            this.players[1].status = game[2]
+          }
 
           // send match data to server
           // console.log({
           //   match: this.match,
-          //   players: this.players,
-          //   over: this.over
+          //   players: this.players
           // })
 
-          axios.post('http://localhost:3000/api/ping/matches', {
+          axios.post('http://localhost:3000/api/ping/matches.json', {
             match: this.match,
-            players: this.players,
-            over: this.over
+            players: this.players
           })
           .then(function (response) {
             console.log(response);
