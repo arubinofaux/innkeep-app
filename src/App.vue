@@ -189,9 +189,11 @@ export default {
           //   players: this.players
           // })
 
-          axios.post('http://localhost:3000/api/ping/matches.json', {
-            match: this.match,
-            players: this.players
+          axios.post('http://localhost:3000/api/ping/hearthstone/matches.json', {
+            match: {
+              match: this.match,
+              players: this.players
+            }
           })
           .then(function (response) {
             console.log(response);
