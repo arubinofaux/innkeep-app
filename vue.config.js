@@ -5,6 +5,8 @@ module.exports = {
         "appId": "com.yolo.innkeep",
         "productName": "innKeep",
         "win": {
+          "certificateFile": "../innkeep-elec.pfx",
+          "certificatePassword": "",
           publish: [
             {
               provider: "github"

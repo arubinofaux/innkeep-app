@@ -1,6 +1,6 @@
 {
   "name": "innkeep",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Match tracker for Hearthstone",
   "author": "Dainel Vera <arubinofaux@gmail.com>",
   "private": true,
