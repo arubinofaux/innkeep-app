@@ -1,16 +1,18 @@
 'use strict'
 
 import * as path from 'path';
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, Menu } from 'electron'
 import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const shell = require('electron').shell
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let menu
 
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -27,6 +29,47 @@ function createWindow () {
       nodeIntegration: true
     } 
   })
+
+  menu = Menu.buildFromTemplate([
+    {
+      label: 'Menu',
+      submenu: [
+        {
+          label:'Reload App',
+          role: 'forceReload'
+        },
+        {type:'separator'},
+        {
+          label:'Exit',
+          click() {
+            app.quit()
+          }
+        }
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label:'Learn More',
+          click() { 
+            shell.openExternal('https://innkeepbattles.com')
+          }
+        },
+        {
+          label:'Discord',
+          click() { 
+            shell.openExternal('https://discord.gg/vMtwHqf')
+          }
+        },
+        {
+          label:'Debug Tool',
+          role: 'toggledevtools'
+        }
+      ]
+    }
+  ])
+  Menu.setApplicationMenu(menu);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
