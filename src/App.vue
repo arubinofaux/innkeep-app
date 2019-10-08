@@ -184,12 +184,7 @@ export default {
           }
 
           // send match data to server
-          // console.log({
-          //   match: this.match,
-          //   players: this.players
-          // })
-
-          axios.post('http://localhost:3000/api/ping/hearthstone/matches.json', {
+          axios.post('https://innkeepbattles.com/api/ping/hearthstone/matches.json', {
             match: {
               match: this.match,
               players: this.players
