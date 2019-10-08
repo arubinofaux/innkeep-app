@@ -1,6 +1,8 @@
 {
   "name": "innkeep",
   "version": "0.1.8",
+  "description": "Match tracker for Hearthstone",
+  "author": "Dainel Vera <arubinofaux@gmail.com>",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
