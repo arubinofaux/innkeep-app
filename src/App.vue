@@ -30,6 +30,7 @@
 </template>
 
 <script>
+const electron = require('electron');
 import * as fs from 'fs';
 const chokidar = require('chokidar');
 const splitLines = require('split-lines');
@@ -45,7 +46,7 @@ export default {
   name: 'app',
   data: function() {
     return {
-      logPath: 'C:\\Program Files (x86)\\Hearthstone\\Hearthstone_Data\\output_log.txt',
+      logPath: '',
       lastFileSize: 0,
       players: [],
       match: {
@@ -56,6 +57,14 @@ export default {
       },
       over: []
     };
+  },
+  created: function () {
+    const homeDir =  (electron.app || electron.remote.app).getPath('home');
+    if (process.platform == 'darwin') {
+      this.logPath = homeDir + '/Library/Preferences/Blizzard/Hearthstone/'
+    } else {
+      this.logPath = homeDir + '\\AppData\\LocalLow\\Blizzard Entertainment\\Hearthstone\\output_log.txt'
+    }
   },
   methods: {
     changeLogPath() {
@@ -105,12 +114,6 @@ export default {
     },
     reset() {
       this.players = []
-      // this.match = {
-      //   server: '',
-      //   game: '',
-      //   client: '',
-      //   spectateKey: ''
-      // }
       this.over = []
     },
     update: function (filePath, stats) {
@@ -148,7 +151,7 @@ export default {
         }
 
         // backup name grab
-        if (player = line.match(/\[Power\] GameState.DebugPrintEntitiesChosen\(\) - id=(\d) Player=([^\s]+) EntitiesCount/)) {
+        if (player = line.match(/\[Power\] GameState\.DebugPrintEntitiesChosen\(\) - id=(\d) Player=([^\s]+) EntitiesCount/)) {
           const position = player[1]
           const name = player[2]
 
@@ -196,6 +199,11 @@ export default {
           .catch(function (error) {
             console.log(error);
           });
+          
+          // console.log({
+          //   match: this.match,
+          //   players: this.players
+          // })
         }
 
         // console.log(line)
