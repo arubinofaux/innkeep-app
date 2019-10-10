@@ -55,10 +55,20 @@ export default {
         client: '',
         spectateKey: ''
       },
-      over: []
+      over: [],
+      apiHost: ''
     };
   },
   created: function () {
+    console.log(process.env.NODE_ENV)
+
+    if (process.env.NODE_ENV == 'production') {
+      this.apiHost = 'https://innkeepbattles.com/api/ping/hearthstone/matches.json'
+    } else {
+      this.apiHost = 'http://localhost:3000/api/ping/hearthstone/matches.json'
+    }
+
+
     const homeDir =  (electron.app || electron.remote.app).getPath('home');
     if (process.platform == 'darwin') {
       this.logPath = homeDir + '/Library/Preferences/Blizzard/Hearthstone/'
@@ -187,7 +197,7 @@ export default {
           }
 
           // send match data to server
-          axios.post('https://innkeepbattles.com/api/ping/hearthstone/matches.json', {
+          axios.post(this.apiHost, {
             match: {
               match: this.match,
               players: this.players
