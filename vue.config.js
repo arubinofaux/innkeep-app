@@ -2,8 +2,8 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       builderOptions: {
-        "appId": "com.yolo.innkeep",
-        "productName": "innKeep",
+        "appId": "com.innkeep.battles",
+        "productName": "InnKeep",
         "win": {
           "certificateFile": "../innkeep-elec.pfx",
           "certificatePassword": "",
