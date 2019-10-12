@@ -3,7 +3,7 @@ module.exports = {
     electronBuilder: {
       builderOptions: {
         "appId": "com.innkeep.battles",
-        "productName": "InnKeep",
+        "productName": "InnKeep Companion",
         "win": {
           "certificateFile": "../innkeep-elec.pfx",
           "certificatePassword": "",

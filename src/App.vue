@@ -1,31 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/temp_logo.png" class="logo">
 
-    <div class="el-toggle">
-      <toggle-button @change="onChangeEventHandler"
-                      :labels="{checked: 'Stop Tracking', unchecked: 'Start Tracking'}" 
-                      :color="{checked: '#FF0000', unchecked: '#00FF00', disabled: '#CCCCCC'}"
-                      :width=104
-                       />
+    <div class="container-fuid">
+      <div class="row">
+        <div class="col-6">
+          <img src="./assets/temp_logo.png" class="logo">
+        </div>
+
+        <div class="col-6 toggle">
+          <toggle-button @change="onChangeEventHandler"
+                          :labels="{checked: 'Stop Tracking', unchecked: 'Start Tracking'}" 
+                          :color="{checked: '#FF0000', unchecked: '#00FF00', disabled: '#CCCCCC'}"
+                          :width=100 />
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col-12" v-if="this.players[0]">
+          <h1>{{this.players[0].name}}</h1>
+          <h3>vs</h3>
+          <h1>{{this.players[1].name}}</h1>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col-12 log-location">
+          <div class="form-group">
+            <label>Log File Location</label>
+            <input type="text" class="form-control" v-model="logPath">
+          </div>
+          <button class="btn btn-primary btn-sm" v-on:click="changeLogPath">Change log path</button>
+        </div>
+      </div>
     </div>
 
-    <div class="players" v-if="this.players[0]">
-      <p>{{this.players[0]}}</p>
-      <h3>vs</h3>
-      <p>{{this.players[1]}}</p>
-      <p v-if="this.match.game">match id: {{this.match.game}}</p>
-      <p v-if="this.over[0]">{{this.over}}</p>
-    </div>
-
-    <hr>
-    <div class="tracking">
-      <h4>Tracking logs:</h4>
-      <input type="text" v-model="logPath">
-      <button v-on:click="changeLogPath">Change log path</button>
-    </div>
     <br>
-    <h4>Beta Software :)</h4>
+    <h3>Beta Software :)</h3>
   </div>
 </template>
 
@@ -37,7 +51,7 @@ const splitLines = require('split-lines');
 const axios = require('axios');
 import {FSWatcher} from 'chokidar';
 
-let _watcher = FSWatcher;
+let _watcher;
 let player;
 let match;
 let game;
@@ -55,7 +69,6 @@ export default {
         client: '',
         spectateKey: ''
       },
-      over: [],
       apiHost: ''
     };
   },
@@ -112,7 +125,7 @@ export default {
       this._watcher = watcher;
     },
     stopLog() {
-      if (!this._watcher) {
+      if (!this._watcher.value) {
         return
       }
 
@@ -124,7 +137,6 @@ export default {
     },
     reset() {
       this.players = []
-      this.over = []
     },
     update: function (filePath, stats) {
       const newFileSize = stats.size;
@@ -232,12 +244,9 @@ export default {
   color: #2c3e50;
   margin-top: 14px;
 
-  .logo {
-    width: 84px;
-  }
-
-  .el-toggle {
-    margin-top: 10px;
+  .row {
+    margin-right: 0px;
+    margin-left: 0px;
   }
 
   h1,
@@ -245,6 +254,24 @@ export default {
   h3,
   h4 {
     margin: 0px;
+  }
+
+  .logo {
+    width: 84px;
+  }
+
+  .toggle {
+    padding-top: 27px;
+  }
+
+  h1 {
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  h3 {
+    font-size: 19px;
+    margin: 6px 0px 11px 0px;
   }
 
   .players {
@@ -255,21 +282,8 @@ export default {
     }
   }
 
-  .tracking {
+  .log-location {
     text-align: left;
-
-    button {
-      margin-top: 7px;
-      cursor: pointer;
-    }
-
-    h4 {
-      margin: 0px 0px 7px 0px;
-    }
-
-    input {
-      width: 100%;
-    }
   }
 }
 </style>

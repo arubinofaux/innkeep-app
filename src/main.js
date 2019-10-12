@@ -3,6 +3,8 @@ import App from './App.vue'
 import ToggleButton from 'vue-js-toggle-button'
 const electron = require('electron');
 const fs = require('fs');
+import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const homeDir =  (electron.app || electron.remote.app).getPath('home');
 let applocaldata = ''
